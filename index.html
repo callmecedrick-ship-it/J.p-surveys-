@@ -1,0 +1,921 @@
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>TaskAccess · M-Pesa Survey Tasks</title>
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* ---------- RESET & VARIABLES ---------- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+        }
+
+        :root {
+            --bg: #f7f9fc;
+            --surface: #ffffff;
+            --primary: #1e3a8a;
+            --primary-light: #2563eb;
+            --mpesa-green: #00a651;        /* M-Pesa brand green */
+            --mpesa-dark: #008c44;
+            --accent: #10b981;
+            --accent-soft: #d1fae5;
+            --text-dark: #0b1b33;
+            --text-muted: #5b6b84;
+            --border-light: #e2e8f0;
+            --shadow-sm: 0 8px 20px rgba(0, 0, 0, 0.04), 0 2px 6px rgba(0, 0, 0, 0.02);
+            --shadow-md: 0 20px 35px -8px rgba(0, 0, 0, 0.1), 0 8px 16px -6px rgba(0, 0, 0, 0.02);
+            --radius-card: 24px;
+            --radius-btn: 40px;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text-dark);
+            line-height: 1.5;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+        }
+
+        .app-wrapper {
+            max-width: 1120px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        /* ---------- HEADER ---------- */
+        .header {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .brand-icon {
+            background: var(--primary);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            box-shadow: 0 6px 12px rgba(30, 58, 138, 0.2);
+        }
+
+        .brand h1 {
+            font-size: 1.65rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: var(--primary);
+        }
+
+        .brand span {
+            font-weight: 400;
+            color: var(--text-muted);
+            font-size: 1rem;
+            margin-left: 2px;
+        }
+
+        .badge-survey {
+            background: #eef2ff;
+            color: var(--primary);
+            padding: 0.45rem 1.2rem;
+            border-radius: 50px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid #cbd5e1;
+        }
+
+        .badge-survey i {
+            font-size: 1rem;
+            color: var(--primary-light);
+        }
+
+        /* ---------- MAIN CARD ---------- */
+        .access-card {
+            background: var(--surface);
+            border-radius: var(--radius-card);
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            border: 1px solid var(--border-light);
+            transition: all 0.2s ease;
+        }
+
+        /* ---------- LEFT: TASK PREVIEW ---------- */
+        .task-preview {
+            padding: 2.2rem 2rem;
+            background: linear-gradient(145deg, #ffffff 0%, #f9fbfe 100%);
+            border-right: 1px solid var(--border-light);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .preview-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.6rem;
+        }
+
+        .preview-header h2 {
+            font-size: 1.35rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .preview-header h2 i {
+            color: var(--primary-light);
+        }
+
+        .locked-icon {
+            background: #fee2e2;
+            color: #b91c1c;
+            padding: 6px 12px;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.2s ease;
+        }
+
+        /* fake task cards */
+        .task-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 1.8rem;
+            position: relative;
+        }
+
+        .task-item {
+            background: #f1f5f9;
+            border-radius: 18px;
+            padding: 1rem 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            border: 1px solid #e9eef4;
+            opacity: 0.75;
+            filter: blur(0.3px);
+            position: relative;
+            pointer-events: none;  /* locked */
+            user-select: none;
+            transition: all 0.2s ease;
+        }
+
+        .task-item .task-icon {
+            background: white;
+            width: 38px;
+            height: 38px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-size: 1.1rem;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+            flex-shrink: 0;
+        }
+
+        .task-item .task-info {
+            flex: 1;
+        }
+
+        .task-info h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .task-info p {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .task-reward {
+            background: #e6f7ec;
+            color: #0b5e3c;
+            padding: 5px 10px;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        /* lock overlay */
+        .lock-overlay {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(3px);
+            padding: 12px 18px;
+            border-radius: 60px;
+            width: fit-content;
+            margin: 0 auto 0.5rem;
+            border: 1px solid #e2e8f0;
+            color: #1e293b;
+            font-weight: 500;
+            font-size: 0.9rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+        }
+
+        .lock-overlay i {
+            color: var(--primary);
+            font-size: 1rem;
+        }
+
+        .preview-note {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding-top: 0.8rem;
+            border-top: 1px dashed var(--border-light);
+        }
+
+        .preview-note i {
+            color: var(--primary-light);
+        }
+
+        /* ---------- RIGHT: PAYMENT PANEL ---------- */
+        .payment-panel {
+            padding: 2.2rem 2rem;
+            background: #ffffff;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .payment-panel h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.3rem;
+        }
+
+        .payment-sub {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 1.8rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .payment-sub i {
+            color: var(--mpesa-green);
+        }
+
+        .price-tag {
+            display: flex;
+            align-items: baseline;
+            gap: 6px;
+            margin-bottom: 1.8rem;
+        }
+
+        .price-tag .currency {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .price-tag .amount {
+            font-size: 3.5rem;
+            font-weight: 800;
+            line-height: 1;
+            letter-spacing: -0.03em;
+            color: var(--primary);
+        }
+
+        .price-tag .period {
+            color: var(--text-muted);
+            font-size: 1rem;
+            font-weight: 400;
+            margin-left: 4px;
+        }
+
+        .benefits {
+            list-style: none;
+            margin-bottom: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .benefits li {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.95rem;
+            color: #1e2b45;
+        }
+
+        .benefits i {
+            color: var(--mpesa-green);
+            font-size: 1rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        /* M-Pesa payment option card */
+        .mpesa-option {
+            background: #f0fdf4;
+            border: 2px solid var(--mpesa-green);
+            border-radius: 16px;
+            padding: 1.2rem 1.3rem;
+            margin-bottom: 1.8rem;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            position: relative;
+            box-shadow: 0 6px 14px rgba(0, 166, 81, 0.08);
+        }
+
+        .mpesa-logo {
+            background: var(--mpesa-green);
+            color: white;
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            flex-shrink: 0;
+            box-shadow: 0 6px 12px rgba(0, 166, 81, 0.2);
+        }
+
+        .mpesa-details {
+            flex: 1;
+        }
+
+        .mpesa-details .mpesa-title {
+            font-weight: 700;
+            font-size: 1rem;
+            color: #0b3d2e;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .mpesa-details .mpesa-title i {
+            color: var(--mpesa-green);
+            font-size: 0.9rem;
+        }
+
+        .mpesa-number {
+            font-size: 1.3rem;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            color: var(--mpesa-dark);
+            margin: 2px 0 3px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .mpesa-number .copy-icon {
+            font-size: 0.85rem;
+            color: var(--mpesa-green);
+            background: #e6f7ec;
+            padding: 4px 8px;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-weight: 500;
+            letter-spacing: 0;
+        }
+
+        .mpesa-number .copy-icon:hover {
+            background: #d0f0dc;
+        }
+
+        .mpesa-details p {
+            font-size: 0.8rem;
+            color: #2e6b4a;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .mpesa-details p i {
+            font-size: 0.7rem;
+        }
+
+        .mpesa-check {
+            background: white;
+            border: 2px solid var(--mpesa-green);
+            color: var(--mpesa-green);
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+
+        /* pay button */
+        .pay-btn {
+            background: var(--mpesa-green);
+            color: white;
+            font-size: 1.15rem;
+            font-weight: 700;
+            padding: 1rem 1.5rem;
+            border: none;
+            border-radius: var(--radius-btn);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 12px 20px -8px rgba(0, 166, 81, 0.4);
+            margin-top: 0.5rem;
+            width: 100%;
+            letter-spacing: 0.2px;
+        }
+
+        .pay-btn i {
+            font-size: 1.1rem;
+        }
+
+        .pay-btn:hover {
+            background: var(--mpesa-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 18px 25px -10px rgba(0, 166, 81, 0.5);
+        }
+
+        .pay-btn:active {
+            transform: translateY(1px);
+            box-shadow: 0 6px 12px -6px rgba(0, 166, 81, 0.4);
+        }
+
+        .pay-btn:disabled {
+            background: #9ca3af;
+            box-shadow: none;
+            cursor: not-allowed;
+            transform: none;
+            opacity: 0.8;
+        }
+
+        .secure-note {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 1rem;
+        }
+
+        .secure-note i {
+            color: var(--mpesa-green);
+        }
+
+        /* success banner */
+        .success-banner {
+            background: var(--accent-soft);
+            border-radius: 18px;
+            padding: 0.9rem 1.2rem;
+            display: none;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 1.2rem;
+            border: 1px solid #a7f3d0;
+            color: #0b5e3c;
+            font-weight: 500;
+        }
+
+        .success-banner i {
+            font-size: 1.3rem;
+            color: var(--accent);
+        }
+
+        .success-banner.show {
+            display: flex;
+        }
+
+        /* unlocked state */
+        .access-granted .task-item {
+            opacity: 1;
+            filter: none;
+            pointer-events: auto;
+            background: #ffffff;
+            border-color: var(--accent);
+            box-shadow: 0 6px 14px rgba(16, 185, 129, 0.08);
+            cursor: pointer;
+        }
+
+        .access-granted .lock-overlay {
+            display: none;
+        }
+
+        .access-granted .preview-header .locked-icon {
+            background: #d1fae5;
+            color: #0b5e3c;
+        }
+
+        .access-granted .preview-header .locked-icon i {
+            color: #0b5e3c;
+        }
+
+        /* toast */
+        .toast-message {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: #1e293b;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 60px;
+            font-weight: 500;
+            font-size: 0.95rem;
+            opacity: 0;
+            transition: all 0.25s ease;
+            pointer-events: none;
+            box-shadow: var(--shadow-md);
+            z-index: 999;
+            white-space: nowrap;
+            max-width: 90vw;
+            white-space: normal;
+            text-align: center;
+        }
+
+        .toast-message.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* ---------- RESPONSIVE ---------- */
+        @media (max-width: 820px) {
+            .access-card {
+                grid-template-columns: 1fr;
+            }
+
+            .task-preview {
+                border-right: none;
+                border-bottom: 1px solid var(--border-light);
+                padding: 1.8rem;
+            }
+
+            .payment-panel {
+                padding: 1.8rem;
+            }
+
+            .brand h1 {
+                font-size: 1.4rem;
+            }
+
+            .price-tag .amount {
+                font-size: 3rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 1rem;
+            }
+
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.6rem;
+            }
+
+            .task-preview, .payment-panel {
+                padding: 1.5rem;
+            }
+
+            .task-item {
+                padding: 0.8rem 1rem;
+            }
+
+            .mpesa-option {
+                padding: 1rem;
+                gap: 12px;
+            }
+
+            .mpesa-logo {
+                width: 42px;
+                height: 42px;
+                font-size: 1.2rem;
+            }
+
+            .mpesa-number {
+                font-size: 1.1rem;
+            }
+
+            .price-tag .amount {
+                font-size: 2.6rem;
+            }
+
+            .pay-btn {
+                font-size: 1rem;
+                padding: 0.9rem 1.2rem;
+            }
+
+            .benefits li {
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .task-reward {
+                display: none;
+            }
+            .task-item {
+                gap: 8px;
+            }
+            .task-item .task-icon {
+                width: 32px;
+                height: 32px;
+                font-size: 0.9rem;
+            }
+            .mpesa-number {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-wrapper">
+        <!-- HEADER -->
+        <header class="header">
+            <div class="brand">
+                <div class="brand-icon">
+                    <i class="fas fa-clipboard-check"></i>
+                </div>
+                <h1>TaskAccess<span>·premium</span></h1>
+            </div>
+            <div class="badge-survey">
+                <i class="fas fa-poll-h"></i> 6 fake tasks available
+            </div>
+        </header>
+
+        <!-- MAIN CARD -->
+        <div class="access-card" id="accessCard">
+            <!-- LEFT: TASK PREVIEW -->
+            <div class="task-preview" id="taskPreview">
+                <div class="preview-header">
+                    <h2><i class="fas fa-list-check"></i> Survey tasks</h2>
+                    <div class="locked-icon" id="lockBadge">
+                        <i class="fas fa-lock"></i> locked
+                    </div>
+                </div>
+
+                <div class="task-list" id="taskList">
+                    <!-- Task 1 -->
+                    <div class="task-item">
+                        <div class="task-icon"><i class="fas fa-star"></i></div>
+                        <div class="task-info">
+                            <h4>Product feedback</h4>
+                            <p>2 min · quick rating</p>
+                        </div>
+                        <div class="task-reward">$1.20</div>
+                    </div>
+                    <!-- Task 2 -->
+                    <div class="task-item">
+                        <div class="task-icon"><i class="fas fa-mobile-alt"></i></div>
+                        <div class="task-info">
+                            <h4>App usage survey</h4>
+                            <p>3 min · multiple choice</p>
+                        </div>
+                        <div class="task-reward">$1.80</div>
+                    </div>
+                    <!-- Task 3 -->
+                    <div class="task-item">
+                        <div class="task-icon"><i class="fas fa-globe"></i></div>
+                        <div class="task-info">
+                            <h4>Website impression</h4>
+                            <p>1.5 min · 5 questions</p>
+                        </div>
+                        <div class="task-reward">$0.90</div>
+                    </div>
+                </div>
+
+                <!-- Lock overlay -->
+                <div class="lock-overlay" id="lockOverlay">
+                    <i class="fas fa-circle-exclamation"></i>
+                    <span>Pay via M-Pesa to unlock all 6 tasks</span>
+                </div>
+
+                <div class="preview-note">
+                    <i class="fas fa-info-circle"></i>
+                    <span>Fake tasks · for demo only</span>
+                </div>
+            </div>
+
+            <!-- RIGHT: PAYMENT PANEL (M-PESA) -->
+            <div class="payment-panel">
+                <h3>Unlock full access</h3>
+                <div class="payment-sub">
+                    <i class="fas fa-bolt"></i> One-time payment, instant access
+                </div>
+
+                <!-- Success banner (hidden initially) -->
+                <div class="success-banner" id="successBanner">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Payment confirmed! All tasks unlocked.</span>
+                </div>
+
+                <div class="price-tag">
+                    <span class="currency">KSh</span>
+                    <span class="amount">650</span>
+                    <span class="period">/ one-time</span>
+                </div>
+
+                <ul class="benefits">
+                    <li><i class="fas fa-check-circle"></i> Access all 6 fake survey tasks</li>
+                    <li><i class="fas fa-check-circle"></i> Earn rewards (demo only)</li>
+                    <li><i class="fas fa-check-circle"></i> No subscription, lifetime access</li>
+                </ul>
+
+                <!-- M-Pesa payment option (specific number) -->
+                <div class="mpesa-option">
+                    <div class="mpesa-logo">
+                        M-PESA
+                    </div>
+                    <div class="mpesa-details">
+                        <div class="mpesa-title">
+                            <i class="fas fa-mobile-screen-button"></i> Pay via M-Pesa
+                        </div>
+                        <div class="mpesa-number">
+                            0794142317
+                            <span class="copy-icon" id="copyMpesaBtn" title="Copy number">
+                                <i class="fas fa-copy"></i> Copy
+                            </span>
+                        </div>
+                        <p><i class="fas fa-info-circle"></i> Send KSh 650 to this number</p>
+                    </div>
+                    <div class="mpesa-check">
+                        <i class="fas fa-check"></i>
+                    </div>
+                </div>
+
+                <!-- Pay button (M-Pesa simulation) -->
+                <button class="pay-btn" id="payButton">
+                    <i class="fas fa-lock"></i> Pay KSh 650 via M-Pesa
+                </button>
+
+                <div class="secure-note">
+                    <i class="fas fa-shield-alt"></i> Demo payment · no real charge
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast-message" id="toastMessage">💸 Payment simulated — tasks unlocked!</div>
+
+    <script>
+        (function() {
+            // DOM elements
+            const accessCard = document.getElementById('accessCard');
+            const lockBadge = document.getElementById('lockBadge');
+            const lockOverlay = document.getElementById('lockOverlay');
+            const payButton = document.getElementById('payButton');
+            const successBanner = document.getElementById('successBanner');
+            const toastMessage = document.getElementById('toastMessage');
+            const copyMpesaBtn = document.getElementById('copyMpesaBtn');
+
+            // State
+            let isPaid = false;
+
+            // ---------- TOAST ----------
+            function showToast(text, duration = 2500) {
+                toastMessage.textContent = text;
+                toastMessage.classList.add('show');
+                clearTimeout(window.toastTimer);
+                window.toastTimer = setTimeout(() => {
+                    toastMessage.classList.remove('show');
+                }, duration);
+            }
+
+            // ---------- COPY M-PESA NUMBER ----------
+            copyMpesaBtn.addEventListener('click', function(e) {
+                e.stopPropagation(); // avoid triggering any parent click
+                const number = '0794142317';
+                navigator.clipboard.writeText(number).then(() => {
+                    showToast('📋 M-Pesa number copied: 0794142317');
+                }).catch(() => {
+                    // Fallback
+                    showToast('Number: 0794142317 (copy manually)');
+                });
+            });
+
+            // ---------- UNLOCK TASKS ----------
+            function unlockTasks() {
+                if (isPaid) return;
+                isPaid = true;
+
+                // Add visual class
+                accessCard.classList.add('access-granted');
+
+                // Update lock badge
+                lockBadge.innerHTML = '<i class="fas fa-lock-open"></i> unlocked';
+                lockBadge.style.background = '#d1fae5';
+                lockBadge.style.color = '#0b5e3c';
+
+                // Hide overlay
+                lockOverlay.style.display = 'none';
+
+                // Show success banner
+                successBanner.classList.add('show');
+
+                // Change pay button
+                payButton.innerHTML = '<i class="fas fa-check-circle"></i> Access granted';
+                payButton.style.background = '#10b981';
+                payButton.style.boxShadow = '0 12px 20px -8px rgba(16, 185, 129, 0.4)';
+                payButton.disabled = true;
+                payButton.style.cursor = 'default';
+                payButton.style.transform = 'none';
+
+                // Make tasks clickable (demo)
+                const taskItems = document.querySelectorAll('.task-item');
+                taskItems.forEach(task => {
+                    task.style.pointerEvents = 'auto';
+                    task.style.cursor = 'pointer';
+                    task.addEventListener('click', function() {
+                        if (!isPaid) return;
+                        const taskName = this.querySelector('.task-info h4')?.innerText || 'Task';
+                        showToast(`📋 Starting: ${taskName} (demo)`);
+                    });
+                });
+
+                // Toast
+                showToast('✅ Payment confirmed! All tasks unlocked.');
+            }
+
+            // ---------- PAY BUTTON HANDLER (M-PESA SIMULATION) ----------
+            payButton.addEventListener('click', function(e) {
+                e.preventDefault();
+
+                if (isPaid) {
+                    showToast('You already have access. Enjoy the tasks!');
+                    return;
+                }
+
+                // Simulate payment processing
+                payButton.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Sending M-Pesa request...';
+                payButton.disabled = true;
+                payButton.style.opacity = '0.9';
+
+                // Simulate STK push / payment confirmation delay
+                setTimeout(() => {
+                    unlockTasks();
+                }, 1200);
+            });
+
+            // ---------- (Optional) prevent any accidental card click ----------
+            // No extra action needed.
+
+            // Initial: ensure tasks are locked (CSS pointer-events: none).
+            // But we make sure pay button state is clean.
+        })();
+    </script>
+</body>
+  </html>
